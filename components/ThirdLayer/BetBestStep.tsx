@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react'
-import SmallGrids from './SmallGrids'
-import { Center, Flex, Spacer, Text, VStack } from 'native-base'
+import React, { useMemo } from 'react';
+import { Center, Flex, Text, VStack } from 'native-base';
+import BigEyeRoad from '../Roads/BigEyeRoad';
+import Cockroach from '../Roads/Cockroach';
+import SmallRoad from '../Roads/SmallRoad';
 
 function BetBestStep() {
-    const grids = 216
     const SmallGrid = useMemo(() => {
-        return <SmallGrids numCols={100} numRows={6} />
-    }, [grids])
+        return <BigEyeRoad />
+    }, [])
 
     return (
         <VStack space={1} marginTop={1}>
@@ -28,7 +29,7 @@ function BetBestStep() {
 
                 </Center>
                 <Flex w={"78%"} borderColor={'blue.900'} borderWidth={'1px'}>
-                    {SmallGrid}
+                    <SmallRoad />
                 </Flex>
             </Flex>
             <Flex flexDirection={'row'}>
@@ -38,34 +39,9 @@ function BetBestStep() {
                     </Text>
                 </Center>
                 <Flex w={"78%"} borderColor={'black'} borderWidth={'1px'}>
-                    {SmallGrid}
+                    <Cockroach />
                 </Flex>
             </Flex>
-            {/* 
-            <View style={{ display: 'flex', flexDirection: 'row', height: '33.33%' }}>
-                <View style={{ width: '20%', backgroundColor: 'white', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={{ paddingTop: 2, paddingBottom: 2, width: "90%", borderBottomColor: 'gray', borderBottomWidth: 1, height: '80%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontWeight: 'bold' }}>
-                            Best
-                        </Text>
-                    </View>
-                </View>
-                <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', margin: 2 }}>
-                    <SmallGrids grids={grids} />
-                </View>
-            </View>
-
-
-            <View style={{ display: 'flex', flexDirection: 'row', height: '33.33%' }}>
-                <View style={{ width: '20%', backgroundColor: 'lightblue', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontWeight: 'bold', color: 'black' }}>
-                        STEP
-                    </Text>
-                </View>
-                <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', margin: 2 }}>
-                    <SmallGrids grids={grids} />
-                </View>
-            </View> */}
         </VStack>
     )
 }

@@ -1,9 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Table, Rows } from 'react-native-table-component';
-import { useGameStore } from '../../zustanstorage/gameStorage';
-import { useBigEyeStore } from '../../zustanstorage/bigEyeStorage';
-import { useSmallRoadStore } from '../../zustanstorage/smallEyeRoad';
 import { useGeneralStoreRoad } from '../../zustanstorage/generalStorage';
 
 interface BigEyeProps { }

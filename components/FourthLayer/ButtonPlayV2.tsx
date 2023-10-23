@@ -21,8 +21,6 @@ function ButtonPlayV2({ color, persona }: { color: ColorType, persona: 'B' | "P"
 
     const { strategy } = useBetStratStore()
 
-    const [stateBet, setstateBet] = useState<("P" | "B")[][] | null>(null)
-
     const updateGrid = (persona: 'P' | 'B') => {
         if (!lastStateofGrid) {
             gameGrid[0][0] = persona
@@ -58,9 +56,6 @@ function ButtonPlayV2({ color, persona }: { color: ColorType, persona: 'B' | "P"
 
     const updateRoadonClick = (lengthofData: number, topRow: { first: number, second: number }, notOntopRow: number, compilation: ("P" | "B")[][]) => {
         const { first, second } = topRow
-        if (lengthofData == 1) {
-            console.log(compilation, compilation.length, lengthofData, compilation[lengthofData])
-        }
         try {
             if (compilation.length > lengthofData) {
                 if (compilation[lengthofData].length > 1) { // the second row is more than one
@@ -148,36 +143,32 @@ function ButtonPlayV2({ color, persona }: { color: ColorType, persona: 'B' | "P"
     const updateBigRoad = (pick: '🔴' | '🔵' | '⚪' | null | undefined, where: 'bigroad' | 'smallroad' | 'cockroach') => {
         if (pick) {
             const lastStateOfPick = where == 'bigroad' ? lastpick.bigroad : where == 'smallroad' ? lastpick.smallroad : lastpick.cockroach
-            const { pick: lastPick, loc } = lastStateOfPick as any
             const whatRoad = where === 'bigroad' ? bigRoadCompilation : where == 'cockroach' ? cockroachRoadCompilation : smallRoadCompilation;
             let location: { row: number, column: number } = { column: -1, row: -1 }
             const columns = Array.from({ length: 6 }, (_, index) => index);
             const freshRow = getFreshRow(where)
+            console.log('fresh row', freshRow)
             if (freshRow == 0) {
                 location = { row: 0, column: 0 }
             } else {
-                for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-                    const lastEntry = whatRoad[columnIndex][freshRow - 1]
-                    if (where == 'bigroad') {
-                        console.log(lastEntry, 'lastentry', columnIndex)
-                    }
-
-                    if (lastEntry == '⚪') {
-                        if (whatRoad[columnIndex - 1][freshRow - 1] == pick) { //contiinue vertical
-                            location = { row: freshRow - 1, column: columnIndex }
-                            break
-                        } else {
-                            location = { row: freshRow, column: 0 }
-                            break
-                        }
+                const { pick: lastPick, loc } = lastStateOfPick as any
+                const [lastRow, lastColumn] = loc
+                if (lastPick == pick) { //continue vertically
+                    if (lastColumn == 5) {
+                        location = { row: lastRow + 1, column: 5 }
                     } else {
-                        if (columnIndex == 5) {
-                            if (lastPick == pick)
-                                location = { row: freshRow, column: columnIndex }
-                            break
+                        //check below
+                        const valueBelow = whatRoad[lastColumn + 1][lastRow]
+                        console.log(valueBelow, 'below value')
+                        if (valueBelow == '⚪') {
+                            location = { row: lastRow, column: lastColumn + 1 }
+                        } else {
+                            location = { row: lastRow + 1, column: lastColumn }
                         }
-                    }
 
+                    }
+                } else {
+                    location = { row: freshRow, column: 0 }
                 }
             }
             const copyofCompilation = whatRoad
@@ -229,18 +220,23 @@ function ButtonPlayV2({ color, persona }: { color: ColorType, persona: 'B' | "P"
 
                     <Button onPress={() => {
                         // onPressButtonPlay(persona)
-                        play(persona)
-                        updateGrid(persona)
-                        const compilation = addToBetCompilation(persona)
-                        setAmountAndStep()
-                        setTimeout(() => {
-                            const bigRoad = updateRoadonClick(1, { first: 1, second: 2 }, 1, compilation);
-                            const smallRoad = updateRoadonClick(2, { first: 1, second: 3 }, 2, compilation);
-                            const cockroach = updateRoadonClick(3, { first: 1, second: 4 }, 3, compilation);
-                            updateBigRoad(bigRoad, 'bigroad');
-                            updateBigRoad(smallRoad, 'smallroad');
-                            updateBigRoad(cockroach, 'cockroach');
-                        }, 10);
+                        try {
+                            play(persona)
+                            updateGrid(persona)
+                            const compilation = addToBetCompilation(persona)
+                            setAmountAndStep()
+                            setTimeout(() => {
+                                const bigRoad = updateRoadonClick(1, { first: 1, second: 2 }, 1, compilation);
+                                const smallRoad = updateRoadonClick(2, { first: 1, second: 3 }, 2, compilation);
+                                const cockroach = updateRoadonClick(3, { first: 1, second: 4 }, 3, compilation);
+                                updateBigRoad(bigRoad, 'bigroad');
+                                updateBigRoad(smallRoad, 'smallroad');
+                                updateBigRoad(cockroach, 'cockroach');
+                            }, 10);
+                        } catch (error) {
+                            console.log(error)
+                        }
+
                     }} m={'1px'} w={"70%"} h={'100%'} backgroundColor={color} borderRadius={10} borderColor={'black'} borderWidth={1}>
                         <Text color={'white'} fontWeight={'bold'}>
                             {persona}

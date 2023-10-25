@@ -1,22 +1,55 @@
-import React, { useState } from 'react'
-import { DimensionValue, Text, View } from 'react-native'
+import React, {useState} from 'react';
+import {
+  DimensionValue,
+  Text,
+  Touchable,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import ChangePatternUsage from '../Modals/ChangePatternUsage';
+import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 
 interface props {
-    width: DimensionValue | undefined
+  width: DimensionValue | undefined;
 }
-
 
 function General(props: props) {
-
-    return (
-        <View style={{ width: props.width, backgroundColor: 'white', padding: 3, margin: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <View style={{ paddingTop: 2, paddingBottom: 2, width: "100%", borderBottomColor: 'black', borderBottomWidth: 1 }}>
-                <Text >
-                    GENERAL
-                </Text>
-            </View>
+  const [isModalOpen, setisModalOpen] = useState(false);
+  const {selectedPattern} = useGeneralStoreRoad();
+  return (
+    <View
+      style={{
+        width: props.width,
+        backgroundColor: 'white',
+        padding: 3,
+        margin: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <ChangePatternUsage
+        isVisble={isModalOpen}
+        closeModal={() => {
+          setisModalOpen(false);
+        }}
+      />
+      <TouchableOpacity
+        onPress={() => {
+          setisModalOpen(true);
+        }}>
+        <View
+          style={{
+            paddingTop: 2,
+            paddingBottom: 2,
+            width: '100%',
+            borderBottomColor: 'black',
+            borderBottomWidth: 1,
+          }}>
+          <Text>{selectedPattern}</Text>
         </View>
-    )
+      </TouchableOpacity>
+    </View>
+  );
 }
 
-export default General
+export default General;

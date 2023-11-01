@@ -54,10 +54,48 @@ function App(): JSX.Element {
   const {bigEyeResults, cockroachRoadResults, smallRoadResults} =
     useAllResult();
 
-  const {reset: generalStorageReset, selectedPattern} = useGeneralStoreRoad();
+  const {
+    reset: generalStorageReset,
+    selectedPattern,
+    selectedPatternNumber,
+  } = useGeneralStoreRoad();
 
-  const {pattern} = usePatternStore();
+  const {allPatterns} = usePatternStore();
 
+  const selectedKeyPattern = allPatterns.filter(value => {
+    let key: 'G' | 'C1' | 'C2' | 'C3' | 'U' = 'G';
+
+    switch (selectedPattern) {
+      case 'GENERAL':
+        key = 'G';
+        break;
+      case 'CHINA 1':
+        key = 'C1';
+        break;
+      case 'CHINA 2':
+        key = 'C2';
+        break;
+      case 'CHINA 3':
+        key = 'C3';
+        break;
+      case 'UNITED':
+        key = 'U';
+        break;
+      default:
+        // Handle unexpected case
+        break;
+    }
+    return value.patternKey == key;
+  });
+
+  const {patterns} = selectedKeyPattern[0];
+
+  const selectedNumber =
+    selectedPattern != 'UNITED' && parseInt(selectedPatternNumber) > 3
+      ? 1
+      : parseInt(selectedPatternNumber);
+
+  const pattern = patterns[selectedNumber - 1];
   const {reset: resetBigEye} = useBigEyeStore();
 
   var {height, width} = Dimensions.get('window');
@@ -66,7 +104,92 @@ function App(): JSX.Element {
     return array.slice(-numb);
   };
 
+  function findMostRepeating(arr: ('P' | 'B')[]) {
+    let counts: any = {};
+    let maxCount = 0;
+    let mostRepeating = arr[0];
+
+    for (let i = 0; i < arr.length; i++) {
+      let current: any = arr[i];
+      counts[current] = (counts[current] || 0) + 1;
+      if (counts[current] > maxCount) {
+        maxCount = counts[current];
+        mostRepeating = current;
+      }
+    }
+
+    return mostRepeating;
+  }
+
+  const lastResultAll = () => {
+    const maxCount = getMaxCount();
+    const allresult_: 'B' | 'P' | 'X' | null = crawlPattern(
+      maxCount,
+      allresult,
+    );
+    const bigEyeResults_: 'B' | 'P' | 'X' | null = crawlPattern(
+      maxCount,
+      bigEyeResults,
+    );
+    const smallRoadResults_: 'B' | 'P' | 'X' | null = crawlPattern(
+      maxCount,
+      smallRoadResults,
+    );
+    const cockroachRoadResults_: 'B' | 'P' | 'X' | null = crawlPattern(
+      maxCount,
+      cockroachRoadResults,
+    );
+    console.log(
+      {
+        allresult_,
+        bigEyeResults_,
+        smallRoadResults_,
+        cockroachRoadResults_,
+      },
+      'data here',
+    );
+  };
+
+  const getMaxCount = () => {
+    let maxCount = 0;
+    pattern.map(pattern_ => {
+      if (maxCount < pattern_['pattern'].length) {
+        maxCount = pattern_['pattern'].length;
+      }
+    });
+    return maxCount;
+  };
+
+  const crawlPattern: any = (maxCount: number, resultToUse: ('B' | 'P')[]) => {
+    // Base cases: if pattern is empty or maxCount is 0, return null
+    if (resultToUse.length === 0 || maxCount === 0) {
+      return null;
+    }
+
+    // Helper function to get last elements from resultToUse
+    const getLastElements = (arr: ('B' | 'P')[], count: number) => {
+      return arr.slice(-count);
+    };
+
+    // Get the last elements
+    const lastElements = getLastElements(resultToUse, maxCount);
+
+    // Find matching pattern
+    for (const data of pattern) {
+      const {nextMove, pattern} = data;
+
+      // Compare patterns
+      if (JSON.stringify(pattern) === JSON.stringify(lastElements)) {
+        return nextMove;
+      }
+    }
+
+    // Recursive call with reduced maxCount if no match is found
+    return crawlPattern(maxCount - 1, resultToUse);
+  };
+
   useEffect(() => {
+    lastResultAll();
     const resultToUse =
       selectedPattern == 'GENERAL'
         ? allresult
@@ -78,23 +201,21 @@ function App(): JSX.Element {
         ? cockroachRoadResults
         : allresult;
 
-    const availableResultPattern = pattern.filter(pat => {
-      const {pattern} = pat;
-      return JSON.stringify(pattern) == JSON.stringify(resultToUse);
-    });
-
-    if (availableResultPattern.length != 0) {
-      setNexMove(availableResultPattern[0].nextMove);
-    } else {
-      const newResult = getLastELements(resultToUse, 1);
-      pattern.map(patt => {
-        const {nextMove, pattern} = patt;
-        if (JSON.stringify(pattern) == JSON.stringify(newResult)) {
-          setNexMove(nextMove);
-        }
-      });
+    //crawl the result here
+    const maxCount = getMaxCount();
+    const nextMove: 'B' | 'P' | 'X' | null = crawlPattern(
+      maxCount,
+      resultToUse,
+    );
+    if (nextMove) {
+      setNexMove(nextMove);
     }
-  }, [allresult.length]);
+  }, [
+    allresult.length,
+    bigEyeResults.length,
+    smallRoadResults.length,
+    cockroachRoadResults.length,
+  ]);
 
   return (
     <NativeBaseProvider>
@@ -197,7 +318,7 @@ function App(): JSX.Element {
                     : status.toUpperCase()}
                 </Text>
               </Center>
-              <Button
+              {/* <Button
                 backgroundColor={'black'}
                 onPress={() => {
                   reset();
@@ -205,7 +326,7 @@ function App(): JSX.Element {
                   resetBigEye();
                 }}>
                 RESET
-              </Button>
+              </Button> */}
               <Button
                 onPress={() => {
                   BackHandler.exitApp();

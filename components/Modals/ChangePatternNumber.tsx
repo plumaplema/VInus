@@ -12,28 +12,24 @@ interface ChangePatternNumberProps {
 
 function ChangePatternNumber(props: ChangePatternNumberProps) {
   const {isVisble, closeModal} = props;
-  const {selectedPatternNumber, setSelectedPatternNumber} =
+  const {selectedPatternNumber, setSelectedPatternNumber, selectedPattern} =
     useGeneralStoreRoad();
-  const setOfPatterns = useMemo(
-    () => [
-      {
-        id: '1', // acts as primary key, should be unique and non-empty string
-        label: '1',
-        value: '1',
-      },
-      {
-        id: '2', // acts as primary key, should be unique and non-empty string
-        label: '2',
-        value: '2',
-      },
-      {
-        id: '3', // acts as primary key, should be unique and non-empty string
-        label: '3',
-        value: '3',
-      },
-    ],
-    [],
-  );
+  const setOfPatterns = Array.from({length: 3}, (_, key) => {
+    return {
+      id: (key + 1).toString(),
+      label: (key + 1).toString(),
+      value: (key + 1).toString(),
+    };
+  });
+
+  const setOfUnitedPatterns = Array.from({length: 10}, (_, key) => {
+    return {
+      id: (key + 1).toString(),
+      label: (key + 1).toString(),
+      value: (key + 1).toString(),
+    };
+  });
+
   const [selectedId, setSelectedId] = useState<any>(selectedPatternNumber);
   return (
     <Modal style={{backgroundColor: 'white'}} coverScreen isVisible={isVisble}>
@@ -57,7 +53,11 @@ function ChangePatternNumber(props: ChangePatternNumberProps) {
                 justifyContent: 'flex-start',
                 alignItems: 'flex-start',
               }}
-              radioButtons={setOfPatterns}
+              radioButtons={
+                selectedPattern == 'UNITED'
+                  ? setOfUnitedPatterns
+                  : setOfPatterns
+              }
               onPress={setSelectedId}
               selectedId={selectedId}
             />

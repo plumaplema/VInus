@@ -1,128 +1,83 @@
-import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+import {create} from 'zustand';
+import {devtools, persist} from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {allFirstArray, allSecondArray, allThirdArray} from './patterns';
 
 interface PatternState {
-    pattern: Array<{ 'nextMove': 'P' | 'B' | 'X', 'pattern': Array<'P' | 'B'> }>
-    setPattern: (pattern: Array<{ 'nextMove': 'P' | 'B' | 'X', 'pattern': Array<'P' | 'B'> }>) => void,
-    reset: () => void
+  allPatterns: Array<{
+    patternKey: 'G' | 'C1' | 'C2' | 'C3' | 'U';
+    patterns: Array<
+      Array<{nextMove: 'P' | 'B' | 'X'; pattern: Array<'P' | 'B'>}>
+    >;
+  }>;
+  updatePattern: (
+    patternKeyIndex: number,
+    indexInPattern: number,
+    pattern: Array<{nextMove: 'P' | 'B' | 'X'; pattern: Array<'P' | 'B'>}>,
+  ) => void;
+  addMorePattern: (patternKeyIndex: number, selectedPattern: number) => void;
 }
 
 export const usePatternStore = create<PatternState>()(
-    devtools(
-        (set) => ({
-            pattern: [
-                {
-                    nextMove: 'P',
-                    pattern: ['P']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['P', 'B', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'B']
-                },
-                {
-                    nextMove: 'X',
-                    pattern: ['B', 'P', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'P', 'P', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B', 'P', 'B', 'B', 'P']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['P', 'B', 'B', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'P', 'B', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['P', 'B', 'B', 'P', 'P', 'B']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'P', 'B', 'B', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'P', 'P', 'P', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B', 'P', 'B', 'B', 'B', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'B', 'P', 'B', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B', 'P', 'P', 'B', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'P', 'P', 'B', 'B', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B', 'P', 'B', 'B', 'P', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'B', 'B', 'P', 'B', 'B', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['B', 'P', 'P', 'P', 'B', 'P', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['P', 'B', 'B', 'P', 'B', 'B', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'P', 'B', 'P', 'P', 'B']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['P', 'B', 'B', 'P', 'B', 'B', 'P', 'B']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'P', 'B', 'P', 'P', 'B', 'P']
-                },
-                {
-                    nextMove: 'B',
-                    pattern: ['P', 'B', 'B', 'B', 'P', 'P', 'P']
-                },
-                {
-                    nextMove: 'P',
-                    pattern: ['B', 'P', 'P', 'P', 'B', 'B', 'B']
-                }
+  devtools(
+    persist(
+      set => ({
+        allPatterns: [
+          {
+            patternKey: 'G',
+            patterns: [allFirstArray, allSecondArray, allThirdArray],
+          },
+          {
+            patternKey: 'C1',
+            patterns: [allFirstArray, allSecondArray, allThirdArray],
+          },
+          {
+            patternKey: 'C2',
+            patterns: [allFirstArray, allSecondArray, allThirdArray],
+          },
+          {
+            patternKey: 'C3',
+            patterns: [allFirstArray, allSecondArray, allThirdArray],
+          },
+          {
+            patternKey: 'U',
+            patterns: [
+              allFirstArray,
+              allSecondArray,
+              allThirdArray,
+              [],
+              [],
+              [],
+              [],
+              [],
+              [],
+              [],
             ],
-            setPattern: (pattern) => set((state) => {
-                return { pattern }
-            }),
-            reset() {
-                set((state) => ({ pattern: [] })
-
-                )
-            },
-        }),
-        {
-            name: 'pattern-storage',
-        }
-    )
-)
+          },
+        ],
+        updatePattern: (patternKeyIndex, indexInPattern, pattern) => {
+          set(state => {
+            const copy = state.allPatterns;
+            copy[patternKeyIndex]['patterns'][indexInPattern] = pattern;
+            console.log(copy);
+            return {allPatterns: copy};
+          });
+        },
+        addMorePattern: (index, selectedPattern) => {
+          set(state => {
+            const copy = [...state.allPatterns];
+            copy[index].patterns[selectedPattern].push({
+              nextMove: 'X',
+              pattern: ['P', 'P'],
+            });
+            return {allPatterns: copy};
+          });
+        },
+      }),
+      {
+        name: 'pattern-storage',
+        getStorage: () => AsyncStorage,
+      },
+    ),
+  ),
+);

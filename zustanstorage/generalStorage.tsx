@@ -3,7 +3,17 @@ import {devtools} from 'zustand/middleware';
 
 interface GameState {
   selectedPattern: 'GENERAL' | 'CHINA 1' | 'CHINA 2' | 'CHINA 3' | 'UNITED';
-  selectedBetNumber: string;
+  selectedBetNumber:
+    | 'BET_1'
+    | 'BET_2'
+    | 'BET_3'
+    | 'BET_4'
+    | 'BET_5'
+    | 'BET_6'
+    | 'BET_7'
+    | 'BET_8'
+    | 'BET_9'
+    | 'BET_10';
   selectedPatternNumber: string;
   betCompilations: Array<Array<'P' | 'B'>>;
   bigRoadCompilation: Array<Array<'🔴' | '🔵' | '⚪'>>;
@@ -18,7 +28,19 @@ interface GameState {
     cockroach: {pick: '🔴' | '🔵' | '⚪'; loc: [number, number]} | null;
   };
   setSelectedPatternNumber: (pattern_number: string) => void;
-  setSelectedBetNumber: (bet_number: string) => void;
+  setSelectedBetNumber: (
+    bet_number:
+      | 'BET_1'
+      | 'BET_2'
+      | 'BET_3'
+      | 'BET_4'
+      | 'BET_5'
+      | 'BET_6'
+      | 'BET_7'
+      | 'BET_8'
+      | 'BET_9'
+      | 'BET_10',
+  ) => void;
   setSelectedPattern: (
     pattern: 'GENERAL' | 'CHINA 1' | 'CHINA 2' | 'CHINA 3' | 'UNITED',
   ) => void;

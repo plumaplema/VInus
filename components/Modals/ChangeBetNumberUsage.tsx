@@ -1,9 +1,11 @@
 import {Button, HStack, ScrollView, Text, VStack, View} from 'native-base';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import Modal from 'react-native-modal';
 import RadioGroup from 'react-native-radio-buttons-group';
 import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 import {TouchableOpacity} from 'react-native';
+import {useBetStratStore} from '../../zustanstorage/betStratStorage';
+import {useStrategyList} from '../../zustanstorage/strategyList';
 
 interface ChangeBetNumberUsageProps {
   isVisble: boolean;
@@ -68,7 +70,25 @@ function ChangeBetNumberUsage(props: ChangeBetNumberUsageProps) {
     ],
     [],
   );
-  const [selectedId, setSelectedId] = useState<any>(selectedBetNumber);
+  const {setStrategy} = useBetStratStore();
+  const {getStrategy} = useStrategyList();
+  const [selectedId, setSelectedId] = useState<
+    | 'BET_1'
+    | 'BET_2'
+    | 'BET_3'
+    | 'BET_4'
+    | 'BET_5'
+    | 'BET_6'
+    | 'BET_7'
+    | 'BET_8'
+    | 'BET_9'
+    | 'BET_10'
+  >(selectedBetNumber);
+
+  useEffect(() => {
+    const index = parseInt(selectedId.substring(4)) - 1;
+    setStrategy(getStrategy(index));
+  }, [selectedId]);
   return (
     <Modal style={{backgroundColor: 'white'}} coverScreen isVisible={isVisble}>
       <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -92,7 +112,7 @@ function ChangeBetNumberUsage(props: ChangeBetNumberUsageProps) {
                 alignItems: 'flex-start',
               }}
               radioButtons={setOfPatterns}
-              onPress={setSelectedId}
+              onPress={(id: any) => setSelectedId(id)}
               selectedId={selectedId}
             />
 

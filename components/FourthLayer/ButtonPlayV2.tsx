@@ -78,7 +78,6 @@ function ButtonPlayV2({
         upDateGrid(persona, 0, startColumn);
       }
     }
-    console.log(lastStateofGrid);
   };
 
   const updateSecondaryRoadOnClick = (
@@ -246,7 +245,6 @@ function ButtonPlayV2({
       let location: {row: number; column: number} = {column: -1, row: -1};
       const columns = Array.from({length: 6}, (_, index) => index);
       const freshRow = getFreshRow(where);
-      console.log('fresh row', freshRow);
       if (freshRow == 0) {
         location = {row: 0, column: 0};
       } else {
@@ -259,7 +257,6 @@ function ButtonPlayV2({
           } else {
             //check below
             const valueBelow = whatRoad[lastColumn + 1][lastRow];
-            console.log(valueBelow, 'below value');
             if (valueBelow == '⚪') {
               location = {row: lastRow, column: lastColumn + 1};
             } else {
@@ -293,14 +290,14 @@ function ButtonPlayV2({
         setCurrentStep(onWin);
 
         const {amount} = strategy[onWin - 1];
-        setBetAmount(amount[0]);
+        setBetAmount(amount);
       } else {
         const indexInStrat = currentStep - 1;
         const {onLose} = strategy[indexInStrat];
         setCurrentStep(onLose);
 
         const {amount} = strategy[onLose - 1];
-        setBetAmount(amount[0]);
+        setBetAmount(amount);
       }
     } else {
       setBetAmount(1000);
@@ -353,18 +350,12 @@ function ButtonPlayV2({
       <Center w={'100%'}>
         <View
           style={{
-            width: '80%',
+            width: '95%',
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          {persona == 'B' ? (
-            <SymbolData data={bankerprediction} />
-          ) : (
-            <SymbolData data={playerprediction} />
-          )}
-
           <Button
             onPress={() => {
               // onPressButtonPlay(persona)
@@ -379,7 +370,7 @@ function ButtonPlayV2({
               }
             }}
             m={'1px'}
-            w={'70%'}
+            w={'85%'}
             h={'100%'}
             backgroundColor={color}
             borderRadius={10}
@@ -389,12 +380,17 @@ function ButtonPlayV2({
               {persona}
             </Text>
           </Button>
-
+          {persona == 'B' ? (
+            <SymbolData data={bankerprediction} />
+          ) : (
+            <SymbolData data={playerprediction} />
+          )}
+          {/* 
           {persona == 'B' ? (
             <NumberData data={bankerprediction} />
           ) : (
             <NumberData data={playerprediction} />
-          )}
+          )} */}
         </View>
       </Center>
     </Flex>

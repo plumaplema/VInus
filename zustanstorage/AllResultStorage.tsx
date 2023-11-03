@@ -6,6 +6,7 @@ interface GameState {
   smallRoadResults: Array<'P' | 'B'>;
   cockroachRoadResults: Array<'P' | 'B'>;
   setResult: (result: 'P' | 'B', where: 'B' | 'S' | 'C') => void;
+  resetAllResults: () => void;
 }
 
 export const useAllResult = create<GameState>()(
@@ -26,6 +27,13 @@ export const useAllResult = create<GameState>()(
           } else {
             return {smallRoadResults: [...state.smallRoadResults, result]};
           }
+        });
+      },
+      resetAllResults() {
+        set({
+          bigEyeResults: [],
+          cockroachRoadResults: [],
+          smallRoadResults: [],
         });
       },
     }),

@@ -25,8 +25,10 @@ const ChangeBetNumber = (props: ChangeBetNumberProps) => {
   const {disable, show} = props;
 
   const {selectedBetNumber} = useGeneralStoreRoad();
+  const primaryIndex = parseInt(selectedBetNumber.substring(4)) - 1;
   const {strategy} = useBetStratStore();
   const [edit, setEdit] = useState(false);
+  const {editStrategy} = useStrategyList();
 
   return (
     <Modal isVisible={show} coverScreen>
@@ -38,7 +40,61 @@ const ChangeBetNumber = (props: ChangeBetNumberProps) => {
         </Center>
 
         {strategy.map((values, index: number) => {
-          return Stategy(values, edit, index);
+          const {amount, onLose, onWin, step} = values;
+          return (
+            <HStack
+              w={'100%'}
+              display={'flex'}
+              alignItems={'center'}
+              justifyContent={'center'}>
+              <Text m={2}>Step {step}</Text>
+
+              <VStack alignItems={'center'} m={2} w={'50%'}>
+                <Text>Bet Amount</Text>
+                <Input
+                  onChangeText={e =>
+                    editStrategy(primaryIndex, index, {
+                      ...values,
+                      amount: parseInt(e),
+                    })
+                  }
+                  isReadOnly={!edit}
+                  placeholder={amount.toString()}
+                />
+              </VStack>
+              <VStack alignItems={'center'} m={2} w={'15%'}>
+                <Text>On Win</Text>
+                <Input
+                  isReadOnly={!edit}
+                  m={2}
+                  w={'100%'}
+                  placeholder={`${onWin.toString()}`}
+                  onChangeText={e =>
+                    editStrategy(primaryIndex, index, {
+                      ...values,
+                      onWin: parseInt(e),
+                    })
+                  }
+                />
+              </VStack>
+
+              <VStack alignItems={'center'} m={2} w={'15%'}>
+                <Text>On Lose</Text>
+                <Input
+                  isReadOnly={!edit}
+                  m={2}
+                  w={'100%'}
+                  placeholder={`${onLose.toString()}`}
+                  onChangeText={e =>
+                    editStrategy(primaryIndex, index, {
+                      ...values,
+                      onLose: parseInt(e),
+                    })
+                  }
+                />
+              </VStack>
+            </HStack>
+          );
         })}
         <Center>
           <HStack>
@@ -72,65 +128,3 @@ const ChangeBetNumber = (props: ChangeBetNumberProps) => {
 };
 
 export default ChangeBetNumber;
-
-interface betStratContent {
-  amount: number;
-  onWin: number;
-  onLose: number;
-  step: number;
-}
-
-function Stategy(
-  values: betStratContent,
-  edit: boolean,
-  secondaryIndex: number,
-) {
-  const {selectedBetNumber} = useGeneralStoreRoad();
-  const index = parseInt(selectedBetNumber.substring(4)) - 1;
-  const {amount, onLose, onWin, step} = values;
-  const [strategy, setstrategy] = useState(values);
-  const {editStrategy} = useStrategyList();
-  useEffect(() => {
-    editStrategy(index, secondaryIndex, strategy);
-  }, [strategy]);
-
-  return (
-    <HStack
-      w={'100%'}
-      display={'flex'}
-      alignItems={'center'}
-      justifyContent={'center'}>
-      <Text m={2}>Step {step}</Text>
-
-      <VStack alignItems={'center'} m={2} w={'50%'}>
-        <Text>Bet Amount</Text>
-        <Input
-          onChangeText={e => setstrategy({...strategy, amount: parseInt(e)})}
-          isReadOnly={!edit}
-          placeholder={amount.toString()}
-        />
-      </VStack>
-      <VStack alignItems={'center'} m={2} w={'15%'}>
-        <Text>On Win</Text>
-        <Input
-          isReadOnly={!edit}
-          m={2}
-          w={'100%'}
-          placeholder={`${onWin.toString()}`}
-          onChangeText={e => setstrategy({...strategy, onWin: parseInt(e)})}
-        />
-      </VStack>
-
-      <VStack alignItems={'center'} m={2} w={'15%'}>
-        <Text>On Lose</Text>
-        <Input
-          isReadOnly={!edit}
-          m={2}
-          w={'100%'}
-          placeholder={`${onLose.toString()}`}
-          onChangeText={e => setstrategy({...strategy, onLose: parseInt(e)})}
-        />
-      </VStack>
-    </HStack>
-  );
-}

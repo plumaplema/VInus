@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Dimensions,
@@ -51,8 +51,12 @@ function App(): JSX.Element {
     currentStep,
     betSum,
   } = useGameStore();
-  const {bigEyeResults, cockroachRoadResults, smallRoadResults} =
-    useAllResult();
+  const {
+    bigEyeResults,
+    cockroachRoadResults,
+    smallRoadResults,
+    resetAllResults,
+  } = useAllResult();
 
   const {
     reset: generalStorageReset,
@@ -100,56 +104,6 @@ function App(): JSX.Element {
 
   var {height, width} = Dimensions.get('window');
 
-  const getLastELements = (array: Array<'B' | 'P'>, numb: number) => {
-    return array.slice(-numb);
-  };
-
-  function findMostRepeating(arr: ('P' | 'B')[]) {
-    let counts: any = {};
-    let maxCount = 0;
-    let mostRepeating = arr[0];
-
-    for (let i = 0; i < arr.length; i++) {
-      let current: any = arr[i];
-      counts[current] = (counts[current] || 0) + 1;
-      if (counts[current] > maxCount) {
-        maxCount = counts[current];
-        mostRepeating = current;
-      }
-    }
-
-    return mostRepeating;
-  }
-
-  const lastResultAll = () => {
-    const maxCount = getMaxCount();
-    const allresult_: 'B' | 'P' | 'X' | null = crawlPattern(
-      maxCount,
-      allresult,
-    );
-    const bigEyeResults_: 'B' | 'P' | 'X' | null = crawlPattern(
-      maxCount,
-      bigEyeResults,
-    );
-    const smallRoadResults_: 'B' | 'P' | 'X' | null = crawlPattern(
-      maxCount,
-      smallRoadResults,
-    );
-    const cockroachRoadResults_: 'B' | 'P' | 'X' | null = crawlPattern(
-      maxCount,
-      cockroachRoadResults,
-    );
-    console.log(
-      {
-        allresult_,
-        bigEyeResults_,
-        smallRoadResults_,
-        cockroachRoadResults_,
-      },
-      'data here',
-    );
-  };
-
   const getMaxCount = () => {
     let maxCount = 0;
     pattern.map(pattern_ => {
@@ -161,12 +115,13 @@ function App(): JSX.Element {
   };
 
   const crawlPattern: any = (maxCount: number, resultToUse: ('B' | 'P')[]) => {
-    // Base cases: if pattern is empty or maxCount is 0, return null
-    if (resultToUse.length === 0 || maxCount === 0) {
-      return null;
-    }
-
     // Helper function to get last elements from resultToUse
+    if (maxCount === 0) {
+      return {result: null, index: -1};
+    }
+    if (!resultToUse) {
+      return {result: null, index: -1};
+    }
     const getLastElements = (arr: ('B' | 'P')[], count: number) => {
       return arr.slice(-count);
     };
@@ -180,35 +135,165 @@ function App(): JSX.Element {
 
       // Compare patterns
       if (JSON.stringify(pattern) === JSON.stringify(lastElements)) {
-        return nextMove;
+        return {result: nextMove, index: pattern.length};
+      }
+    }
+    return crawlPattern(maxCount - 1, resultToUse);
+  };
+  const identifyHighestPattern = (nextMove: any) => {
+    let highestIndex = 0;
+    let highestIndexObjects: any = [];
+
+    for (let i = 0; i < nextMove.length; i++) {
+      if (nextMove[i].index > highestIndex) {
+        highestIndex = nextMove[i].index;
+        highestIndexObjects = [i];
+      } else if (nextMove[i].index === highestIndex) {
+        highestIndexObjects.push(i);
+      }
+    }
+    return highestIndexObjects;
+  };
+
+  const unitedVersionCrawler = (
+    allResults: ('P' | 'B')[][],
+    result: any = null,
+    slicer: number = 0,
+    firstInstance: number,
+    pick: Array<number>,
+  ) => {
+    console.log({result, slicer, allResult: allResults.length});
+    const maxCount = getMaxCount();
+
+    // crawlPatternUnitedVersion(maxCount);
+
+    const nextMove = allResults.map(value => {
+      //Array of {result: nextMove, index: pattern.length};
+      if (value.length > 1) {
+        return crawlPattern(maxCount, value);
+      }
+      return {result: null, index: -1};
+    });
+
+    let allResultsAreNull = true;
+
+    for (let i = 0; i < nextMove.length; i++) {
+      if (nextMove[i].result !== null) {
+        allResultsAreNull = false;
+        break;
       }
     }
 
-    // Recursive call with reduced maxCount if no match is found
-    return crawlPattern(maxCount - 1, resultToUse);
+    if (allResultsAreNull) {
+      if (result) {
+        return {result, road: firstInstance};
+      }
+      return null;
+    } else {
+      const highestPatterns: Array<number> = identifyHighestPattern(nextMove);
+      console.log(highestPatterns, 'highestPattern');
+      if (highestPatterns.length == 1) {
+        console.log('RUnning First');
+        const indexForRoad = highestPatterns[0];
+        console.log('Returning FInde here');
+        if (result) {
+          return {
+            result: result ? result : nextMove[indexForRoad].result,
+            road: pick[indexForRoad],
+          };
+        }
+        return {
+          result: result ? result : nextMove[indexForRoad].result,
+          road: indexForRoad,
+        };
+      } else if (highestPatterns.length > 1) {
+        const allResult = highestPatterns.map(values => {
+          const road =
+            values === 0
+              ? allresult
+              : values === 1
+              ? bigEyeResults
+              : values == 2
+              ? smallRoadResults
+              : cockroachRoadResults;
+          return road.slice(0, slicer);
+        });
+        // const testResult = [
+        //   highestPatterns.includes(0) ? allresult : [],
+        //   highestPatterns.includes(1) ? bigEyeResults : [],
+        //   highestPatterns.includes(2) ? smallRoadResults : [],
+        //   highestPatterns.includes(3) ? cockroachRoadResults : [],
+        // ];
+        // console.log(testResult);
+        return unitedVersionCrawler(
+          allResult,
+          result ? result : nextMove[highestPatterns[0]].result,
+          slicer - 1,
+          highestPatterns[0],
+          highestPatterns,
+        );
+      }
+
+      // let numberofDataFoundinPattern = 0;
+      // let indexForRoad = -1;
+      // for (let i = 0; i < nextMove.length; i++) {
+      //   if (nextMove[i].index > numberofDataFoundinPattern) {
+      //     numberofDataFoundinPattern = nextMove[i].index;
+      //     indexForRoad = i;
+      //   }
+      // }
+
+      // return {
+      //   result: nextMove[indexForRoad].result,
+      //   road: indexForRoad,
+      // };
+    }
   };
 
-  useEffect(() => {
-    lastResultAll();
-    const resultToUse =
-      selectedPattern == 'GENERAL'
-        ? allresult
-        : selectedPattern == 'CHINA 1'
-        ? bigEyeResults
-        : selectedPattern == 'CHINA 2'
-        ? smallRoadResults
-        : selectedPattern == 'CHINA 3'
-        ? cockroachRoadResults
-        : allresult;
+  const [unitedChoosenRoad, setUnitedChoosenRoad] = useState<null | number>(
+    null,
+  );
 
-    //crawl the result here
-    const maxCount = getMaxCount();
-    const nextMove: 'B' | 'P' | 'X' | null = crawlPattern(
-      maxCount,
-      resultToUse,
-    );
-    if (nextMove) {
-      setNexMove(nextMove);
+  useEffect(() => {
+    // lastResultAll();
+    if (selectedPattern === 'UNITED') {
+      const allResults = [
+        allresult,
+        bigEyeResults,
+        smallRoadResults,
+        cockroachRoadResults,
+      ];
+
+      const unitedResult = unitedVersionCrawler(allResults, null, -1, -1);
+      console.log(unitedResult, 'RESULT');
+      if (unitedResult) {
+        const {result, road} = unitedResult;
+        setUnitedChoosenRoad(road);
+        setNexMove(result);
+      }
+    } else {
+      const resultToUse =
+        selectedPattern == 'GENERAL'
+          ? allresult
+          : selectedPattern == 'CHINA 1'
+          ? bigEyeResults
+          : selectedPattern == 'CHINA 2'
+          ? smallRoadResults
+          : selectedPattern == 'CHINA 3'
+          ? cockroachRoadResults
+          : allresult;
+
+      //crawl the result here
+      const maxCount = getMaxCount();
+
+      // crawlPatternUnitedVersion(maxCount);
+      const nextMove = crawlPattern(maxCount, resultToUse);
+
+      if (nextMove) {
+        if (nextMove.result) {
+          setNexMove(nextMove.result);
+        }
+      }
     }
   }, [
     allresult.length,
@@ -265,17 +350,15 @@ function App(): JSX.Element {
             marginTop={1}>
             <HStack space={2}>
               <Center
-                w={'7%'}
-                h={'100%'}
-                borderRadius={100}
-                backgroundColor={
-                  nextMove == 'B'
-                    ? 'red.500'
-                    : nextMove == 'P'
-                    ? 'blue.500'
-                    : 'white'
-                }>
-                {nextMove}
+                bgColor={'white'}
+                flexDirection={'row'}
+                w={'5%'}
+                h={'100%'}>
+                <Text>
+                  {unitedChoosenRoad && unitedChoosenRoad < 0
+                    ? ''
+                    : unitedChoosenRoad}
+                </Text>
               </Center>
               <Center p={1} backgroundColor={'black'}>
                 <Text color={'white'}>STEP</Text>
@@ -318,15 +401,16 @@ function App(): JSX.Element {
                     : status.toUpperCase()}
                 </Text>
               </Center>
-              {/* <Button
+              <Button
                 backgroundColor={'black'}
                 onPress={() => {
                   reset();
                   generalStorageReset();
-                  resetBigEye();
+                  setUnitedChoosenRoad(-1);
+                  resetAllResults();
                 }}>
                 RESET
-              </Button> */}
+              </Button>
               <Button
                 onPress={() => {
                   BackHandler.exitApp();

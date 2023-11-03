@@ -66,13 +66,13 @@ export const useGeneralStoreRoad = create<GameState>()(
       selectedPattern: 'GENERAL',
       selectedPatternNumber: '1',
       bigRoadCompilation: Array.from({length: 6}).map(() =>
-        Array.from({length: 75}, () => '⚪'),
+        Array.from({length: 100}, () => '⚪'),
       ),
       smallRoadCompilation: Array.from({length: 6}).map(() =>
-        Array.from({length: 75}, () => '⚪'),
+        Array.from({length: 100}, () => '⚪'),
       ),
       cockroachRoadCompilation: Array.from({length: 6}).map(() =>
-        Array.from({length: 75}, () => '⚪'),
+        Array.from({length: 100}, () => '⚪'),
       ),
       bigRoadLast: [-1, -1],
       lastpick: {bigroad: null, cockroach: null, smallroad: null},
@@ -176,14 +176,21 @@ export const useGeneralStoreRoad = create<GameState>()(
       },
       reset() {
         set(() => {
-          const emptyCompilation: Array<Array<'🔴' | '🔵' | '⚪'>> = Array.from(
-            {length: 6},
-          ).map(() => Array.from({length: 75}, () => '⚪'));
           return {
             betCompilations: [],
-            bigRoadCompilation: emptyCompilation,
-            smallRoadCompilation: emptyCompilation,
-            cockroachRoadCompilation: emptyCompilation,
+            bigRoadLast: [-1, -1],
+            lastpick: {bigroad: null, cockroach: null, smallroad: null},
+            cockroachRoadLast: [-1, -1],
+            smallRoadLast: [-1, -1],
+            bigRoadCompilation: Array.from({length: 6}).map(() =>
+              Array.from({length: 100}, () => '⚪'),
+            ),
+            smallRoadCompilation: Array.from({length: 6}).map(() =>
+              Array.from({length: 100}, () => '⚪'),
+            ),
+            cockroachRoadCompilation: Array.from({length: 6}).map(() =>
+              Array.from({length: 100}, () => '⚪'),
+            ),
           };
         });
       },

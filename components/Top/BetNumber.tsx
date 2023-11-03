@@ -39,7 +39,7 @@ function BetNumber(props: props) {
             borderBottomColor: 'black',
             borderBottomWidth: 1,
           }}>
-          <Text>{selectedBetNumber}</Text>
+          <Text style={{fontSize: 5}}>{selectedBetNumber}</Text>
         </View>
       </TouchableOpacity>
     </View>

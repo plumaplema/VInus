@@ -10,8 +10,8 @@ function BetBestStep() {
   }, []);
 
   return (
-    <VStack space={1} marginLeft={1} marginTop={1}>
-      <Flex flexDirection={'row'}>
+    <VStack h={'100%'} marginLeft={1} marginTop={1}>
+      <Flex h={'31%'} flexDirection={'row'}>
         {/* <Center borderColor={'amber.900'} borderWidth={'2'} m={1} w={"20%"} backgroundColor={'lightblue'}>
                     <Text fontWeight={'bold'} >
                         BET
@@ -21,7 +21,7 @@ function BetBestStep() {
           {SmallGrid}
         </Flex>
       </Flex>
-      <Flex flexDirection={'row'}>
+      <Flex mt={1} mb={1} h={'31%'} flexDirection={'row'}>
         {/* <Center borderColor={'blue.900'} borderWidth={'2'} m={1} w={"20%"} backgroundColor={'white'}>
                     <Text color={'gray.400'} fontWeight={'bold'}>
                         Best
@@ -32,7 +32,7 @@ function BetBestStep() {
           <SmallRoad />
         </Flex>
       </Flex>
-      <Flex flexDirection={'row'}>
+      <Flex h={'31%'} flexDirection={'row'}>
         {/* <Center m={1} borderColor={'black'} borderWidth={'2'} w={"20%"} backgroundColor={'lightblue'}>
                     <Text color={'gray.400'} fontWeight={'bold'} >
                         BET

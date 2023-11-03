@@ -11,10 +11,14 @@ function Benifit({text, total}: {text: string; total: number}) {
         w={'40%'}
         backgroundColor={'black'}
         padding={'1px'}>
-        <Text color={'white'}>{text}</Text>
+        <Text fontSize={7} color={'white'}>
+          {text}
+        </Text>
       </Center>
       <Center w={'60%'} backgroundColor={'white'}>
-        <Text color={'black'}>{total}</Text>
+        <Text fontSize={7} color={'black'}>
+          {total}
+        </Text>
       </Center>
     </Flex>
   );

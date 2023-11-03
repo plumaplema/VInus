@@ -19,17 +19,22 @@ interface GameState {
   setNexMove: (move: 'B' | 'P' | 'X') => void;
   upDateGrid: (persona: 'P' | 'B', row: number, column: number) => void;
   undo: () => void;
+  getNextMoce: () => 'B' | 'P' | 'X' | null;
   betSum: number;
   betCompilations: Array<Array<'P' | 'B'>>;
 }
 
 export const useGameStore = create<GameState>()(
   devtools(
-    set => ({
+    (set, get) => ({
       currentStep: 1,
       totalbetAmount: 0,
       betCompilations: [],
       lastStateofGrid: null,
+      getNextMoce: () => {
+        const nextMove = get();
+        return nextMove.nextMove;
+      },
       gameGrid: Array.from({length: 6}).map(() =>
         Array.from({length: 75}, () => null),
       ),

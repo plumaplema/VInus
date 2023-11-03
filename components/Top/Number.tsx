@@ -40,7 +40,9 @@ function Number(props: props) {
             borderBottomColor: 'black',
             borderBottomWidth: 1,
           }}>
-          <Text>{selectedPatternNumber}</Text>
+          <Text style={{fontSize: 7, fontWeight: 'bold'}}>
+            {selectedPatternNumber}
+          </Text>
         </View>
       </TouchableOpacity>
     </View>

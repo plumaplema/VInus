@@ -15,13 +15,18 @@ import SmallRoad from '../Roads/SmallRoad';
 import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 import {Rows, Table} from 'react-native-table-component';
 import {useAllResult} from '../../zustanstorage/AllResultStorage';
+import {usePrediction} from '../../zustanstorage/predictions';
 
 function ButtonPlayV2({
   color,
   persona,
+  unitedChoosenRoad,
+  moveNext,
 }: {
   color: ColorType;
   persona: 'B' | 'P';
+  unitedChoosenRoad: number | null;
+  moveNext: 'P' | 'B' | 'X' | null;
 }) {
   const {
     predictAddToBet,
@@ -33,6 +38,7 @@ function ButtonPlayV2({
     cockroachRoadCompilation,
     updateRoadCompilation,
     smallRoadCompilation,
+    selectedPattern,
   } = useGeneralStoreRoad();
 
   const {
@@ -44,6 +50,7 @@ function ButtonPlayV2({
     upDateGrid,
     lastStateofGrid,
     gameGrid,
+    getNextMoce,
   } = useGameStore();
 
   const {strategy} = useBetStratStore();
@@ -174,7 +181,11 @@ function ButtonPlayV2({
       3,
       player,
     );
-    return {bigRoad, smallRoad, cockroach};
+    return {
+      bigRoad,
+      smallRoad,
+      cockroach,
+    };
   };
 
   const bankerpredict = () => {
@@ -197,9 +208,14 @@ function ButtonPlayV2({
       3,
       player,
     );
-    return {bigRoad, smallRoad, cockroach};
+    return {
+      bigRoad,
+      smallRoad,
+      cockroach,
+    };
   };
 
+  const {prediction, setPrediction} = usePrediction();
   const bankerprediction = useMemo(() => bankerpredict(), [betCompilations]);
   const playerprediction = useMemo(() => playerpredict(), [betCompilations]);
 
@@ -282,25 +298,34 @@ function ButtonPlayV2({
     }
   };
 
-  const setAmountAndStep = () => {
-    if (nextMove != null) {
-      if (nextMove === persona) {
-        const indexInStrat = currentStep - 1;
-        const {onWin} = strategy[indexInStrat];
-        setCurrentStep(onWin);
+  const [alreadyRun, setalreadyRun] = useState(1);
 
-        const {amount} = strategy[onWin - 1];
+  const setAmountAndStep = () => {
+    if (moveNext) {
+      if (alreadyRun == 1) {
+        const {amount} = strategy[0];
+        console.log(amount, 'fursjbfassssss');
         setBetAmount(amount);
       } else {
-        const indexInStrat = currentStep - 1;
-        const {onLose} = strategy[indexInStrat];
-        setCurrentStep(onLose);
+        if (nextMove === persona) {
+          const indexInStrat = currentStep - 1;
+          const {onWin} = strategy[indexInStrat];
+          setCurrentStep(onWin);
 
-        const {amount} = strategy[onLose - 1];
-        setBetAmount(amount);
+          const {amount} = strategy[onWin - 1];
+          console.log(amount);
+          setBetAmount(amount);
+        } else {
+          const indexInStrat = currentStep - 1;
+          const {onLose} = strategy[indexInStrat];
+          setCurrentStep(onLose);
+
+          const {amount} = strategy[onLose - 1];
+          console.log(amount);
+          setBetAmount(amount);
+        }
       }
-    } else {
-      setBetAmount(1000);
+      setalreadyRun(alreadyRun + 1);
     }
   };
 
@@ -317,6 +342,86 @@ function ButtonPlayV2({
       setResult(changeResult, where);
     }
   };
+
+  const getrightresult = (road: any, nextMove: 'P' | 'B' | 'X' | null) => {};
+
+  useEffect(() => {
+    if (selectedPattern == 'CHINA 1') {
+      const {bigRoad, cockroach, smallRoad} = bankerprediction;
+      if (nextMove) {
+        const predicted =
+          nextMove == 'B' && bigRoad == '🔴'
+            ? 'B'
+            : nextMove == 'B' && bigRoad == '🔵'
+            ? 'P'
+            : nextMove == 'P' && bigRoad == '🔴'
+            ? 'P'
+            : nextMove == 'P' && bigRoad == '🔵'
+            ? 'B'
+            : null;
+        setPrediction(predicted);
+      }
+    }
+    if (selectedPattern == 'CHINA 2') {
+      const {bigRoad, cockroach, smallRoad} = bankerprediction;
+      if (nextMove) {
+        const predicted =
+          nextMove == 'B' && smallRoad == '🔴'
+            ? 'B'
+            : nextMove == 'B' && smallRoad == '🔵'
+            ? 'P'
+            : nextMove == 'P' && smallRoad == '🔴'
+            ? 'P'
+            : nextMove == 'P' && smallRoad == '🔵'
+            ? 'B'
+            : null;
+        setPrediction(predicted);
+      }
+    }
+
+    if (selectedPattern == 'CHINA 3') {
+      const {bigRoad, cockroach, smallRoad} = bankerprediction;
+      if (nextMove) {
+        const predicted =
+          nextMove == 'B' && cockroach == '🔴'
+            ? 'B'
+            : nextMove == 'B' && cockroach == '🔵'
+            ? 'P'
+            : nextMove == 'P' && cockroach == '🔴'
+            ? 'P'
+            : nextMove == 'P' && cockroach == '🔵'
+            ? 'B'
+            : null;
+        setPrediction(predicted);
+      }
+    }
+    if (selectedPattern == 'UNITED') {
+      const {bigRoad, cockroach, smallRoad} = bankerprediction;
+      console.log('unitedchooseroad', unitedChoosenRoad);
+      if (nextMove) {
+        if (unitedChoosenRoad === 0) {
+          setPrediction(nextMove);
+        }
+        if (unitedChoosenRoad === 1) {
+          const predicted = nextMove == 'B' && bigRoad == '🔴' ? 'B' : 'P';
+          setPrediction(predicted);
+        }
+        if (unitedChoosenRoad === 2) {
+          const predicted = nextMove == 'B' && smallRoad == '🔴' ? 'B' : 'P';
+          setPrediction(predicted);
+        }
+        if (unitedChoosenRoad === 3) {
+          const predicted = nextMove == 'B' && cockroach == '🔴' ? 'B' : 'P';
+          setPrediction(predicted);
+        }
+      }
+    }
+  }, [nextMove]);
+
+  useEffect(() => {
+    console.log(moveNext, 'moce');
+    setAmountAndStep();
+  }, [moveNext, nextMove]);
 
   useEffect(() => {
     const bigRoad = updateSecondaryRoadOnClick(
@@ -364,7 +469,6 @@ function ButtonPlayV2({
                 updateGrid(persona);
                 const compilation = addToBetCompilation(persona);
                 setcompilations_(compilation);
-                setAmountAndStep();
               } catch (error) {
                 console.log(error);
               }

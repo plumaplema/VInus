@@ -15,9 +15,11 @@ function Round(props: props) {
     <TouchableOpacity
       style={{
         backgroundColor: 'blue',
-        padding: 3,
-        margin: 2,
+        padding: 1,
+        marginLeft: 15,
+        marginRight: 1,
         width: props.width,
+        height: 25,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -34,7 +36,9 @@ function Round(props: props) {
           }}
           show={count > 3}
         />
-        <Text style={{color: 'white'}}>{step} Round</Text>
+        <Text style={{fontSize: 7, fontWeight: 'bold', color: 'white'}}>
+          {step} Round
+        </Text>
       </View>
     </TouchableOpacity>
   );

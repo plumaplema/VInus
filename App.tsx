@@ -114,6 +114,38 @@ function App(): JSX.Element {
     return maxCount;
   };
 
+  function countOccurrences(
+    longerArray: ('P' | 'B')[][],
+    targetArray: ('P' | 'B')[],
+  ) {
+    const targetString = targetArray.join('');
+    const longerString = longerArray.map(arr => arr.join('')).join('');
+    console.log(targetString, longerString);
+
+    let count = 0;
+    let index = -1;
+    while ((index = longerString.indexOf(targetString, index + 1)) !== -1) {
+      count++;
+    }
+
+    return count;
+  }
+
+  const anotherLogic = () => {
+    if (selectedPattern == 'UNITED') {
+      const resultToUse = [
+        allresult,
+        bigEyeResults,
+        smallRoadResults,
+        cockroachRoadResults,
+      ];
+      const convert = pattern.map(patt => patt.pattern);
+      const count = countOccurrences(convert, allresult);
+      console.log(count, 'fddddddddddddddd');
+    }
+  };
+  anotherLogic();
+
   const crawlPattern: any = (maxCount: number, resultToUse: ('B' | 'P')[]) => {
     // Helper function to get last elements from resultToUse
     if (maxCount === 0) {
@@ -135,6 +167,7 @@ function App(): JSX.Element {
 
       // Compare patterns
       if (JSON.stringify(pattern) === JSON.stringify(lastElements)) {
+        console.log(pattern);
         return {result: nextMove, index: pattern.length};
       }
     }
@@ -143,7 +176,6 @@ function App(): JSX.Element {
   const identifyHighestPattern = (nextMove: any) => {
     let highestIndex = 0;
     let highestIndexObjects: any = [];
-
     for (let i = 0; i < nextMove.length; i++) {
       if (nextMove[i].index > highestIndex) {
         highestIndex = nextMove[i].index;
@@ -152,6 +184,7 @@ function App(): JSX.Element {
         highestIndexObjects.push(i);
       }
     }
+
     return highestIndexObjects;
   };
 
@@ -174,6 +207,7 @@ function App(): JSX.Element {
       }
       return {result: null, index: -1};
     });
+    console.log('movessssssssssssssssssssssss', nextMove);
 
     let allResultsAreNull = true;
 
@@ -254,6 +288,7 @@ function App(): JSX.Element {
     null,
   );
 
+  const [movenext, setmovenext] = useState<'P' | 'B' | 'X' | null>(null);
   useEffect(() => {
     // lastResultAll();
     if (selectedPattern === 'UNITED') {
@@ -265,7 +300,7 @@ function App(): JSX.Element {
       ];
 
       const unitedResult = unitedVersionCrawler(allResults, null, -1, -1);
-      console.log(unitedResult, 'RESULT');
+      console.log(unitedResult, 'RESULTkkkk');
       if (unitedResult) {
         const {result, road} = unitedResult;
         setUnitedChoosenRoad(road);
@@ -288,9 +323,11 @@ function App(): JSX.Element {
 
       // crawlPatternUnitedVersion(maxCount);
       const nextMove = crawlPattern(maxCount, resultToUse);
+      console.log(nextMove);
 
       if (nextMove) {
         if (nextMove.result) {
+          setmovenext(nextMove.result);
           setNexMove(nextMove.result);
         }
       }
@@ -311,17 +348,90 @@ function App(): JSX.Element {
           hidden={true}
         />
         <ScrollView style={{backgroundColor: 'gray', gap: 1}}>
-          <HStack h={'15%'} p={1}>
-            <Champion width={'35%'} />
-            <Round width={'15%'} />
+          <Center flexDirection={'row'} h={'10%'} p={1}>
+            <Center w={'35%'}>
+              <HStack space={1}>
+                <Center p={1} backgroundColor={'black'}>
+                  <Text fontSize={9} color={'white'}>
+                    STEP
+                  </Text>
+                </Center>
+                <Center p={1} backgroundColor={'white'}>
+                  <Text fontSize={9}>{currentStep}</Text>
+                </Center>
+                <Center p={1} backgroundColor={'black'}>
+                  <Text fontSize={9} color={'white'}>
+                    BET
+                  </Text>
+                </Center>
+                <Center w={'20%'} p={1} backgroundColor={'white'}>
+                  <Text fontSize={9}>{betAmount}</Text>
+                </Center>
+                <Center
+                  p={1}
+                  w={'15%'}
+                  backgroundColor={
+                    status === 'win'
+                      ? 'yellow.300'
+                      : status == 'lose'
+                      ? 'black'
+                      : 'white'
+                  }>
+                  <Text
+                    fontSize={9}
+                    color={
+                      status == 'win'
+                        ? 'red.500'
+                        : status == 'lose'
+                        ? 'white'
+                        : 'black'
+                    }>
+                    {allresult.length == 1
+                      ? 'PAUSE'
+                      : status == 'lose'
+                      ? 'FAIL'
+                      : status == 'win'
+                      ? 'WIN!'
+                      : status == 'tie'
+                      ? 'Result'
+                      : status.toUpperCase()}
+                  </Text>
+                </Center>
+                <Button
+                  size={'small'}
+                  backgroundColor={'black'}
+                  onPress={() => {
+                    reset();
+                    generalStorageReset();
+                    setUnitedChoosenRoad(-1);
+                    resetAllResults();
+                  }}>
+                  <Text fontSize={9} ml={4} mr={4} color={'white'}>
+                    RESET
+                  </Text>
+                </Button>
+                <Button
+                  size="small"
+                  fontSize={9}
+                  onPress={() => {
+                    BackHandler.exitApp();
+                  }}
+                  backgroundColor={'black'}>
+                  <Text fontSize={9} m={1} color={'white'}>
+                    Exit
+                  </Text>
+                </Button>
+              </HStack>
+            </Center>
+            <Round width={'7%'} />
             <General width={'10%'} />
             <Number width={'10%'} />
             <DateNow width={'15%'} />
             <BetNumber width={'10%'} />
-          </HStack>
+          </Center>
 
           <Flex
-            h={'25%'}
+            h={'30%'}
             justifyContent={'center'}
             alignItems={'center'}
             width={'100%'}>
@@ -329,20 +439,23 @@ function App(): JSX.Element {
           </Flex>
 
           <Flex
-            height={'45%'}
+            height={'60%'}
             justifyContent={'center'}
             alignItems={'center'}
             flexDirection={'row'}
             w={'100%'}
             p={1}>
             <Flex m={1} h={'100%'} w={'30%'}>
-              <MainFourthLayer />
+              <MainFourthLayer
+                moveNext={movenext}
+                unitedChoosenRoad={unitedChoosenRoad}
+              />
             </Flex>
             <Flex w={'70%'}>
               <BetBestStep />
             </Flex>
           </Flex>
-          <HStack
+          {/* <HStack
             justifyContent={'center'}
             w={'100%'}
             h={'10%'}
@@ -419,7 +532,7 @@ function App(): JSX.Element {
                 EXIT
               </Button>
             </HStack>
-          </HStack>
+          </HStack> */}
         </ScrollView>
       </Flex>
     </NativeBaseProvider>

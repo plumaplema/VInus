@@ -32,7 +32,7 @@ function DateNow(props: props) {
     <TouchableOpacity
       style={{
         padding: 2,
-        margin: 2,
+
         width: props.width,
         height: '100%',
       }}
@@ -43,12 +43,13 @@ function DateNow(props: props) {
         style={{
           backgroundColor: 'black',
           width: '100%',
+          height: '100%',
         }}>
         <ChangeBetNumber disable={() => setcount(0)} show={count > 3} />
-        <Text style={{color: 'yellow', textAlign: 'center'}}>
+        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 5}}>
           On {formattedDate}
         </Text>
-        <Text style={{color: 'yellow', textAlign: 'center'}}>
+        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 5}}>
           {formattedTime}
         </Text>
       </View>

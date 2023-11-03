@@ -37,7 +37,7 @@ export const usePatternStore = create<PatternState>()(
           },
           {
             patternKey: 'C3',
-            patterns: [allFirstArray, allSecondArray, allThirdArray],
+            patterns: [allFirstArray, allSecondArray, []],
           },
           {
             patternKey: 'U',

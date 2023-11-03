@@ -45,7 +45,9 @@ function General(props: props) {
             borderBottomColor: 'black',
             borderBottomWidth: 1,
           }}>
-          <Text>{selectedPattern}</Text>
+          <Text style={{fontSize: 7, fontWeight: 'bold'}}>
+            {selectedPattern}
+          </Text>
         </View>
       </TouchableOpacity>
     </View>

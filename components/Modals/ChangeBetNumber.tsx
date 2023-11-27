@@ -15,6 +15,7 @@ import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import {useBetStratStore} from '../../zustanstorage/betStratStorage';
 import {useStrategyList} from '../../zustanstorage/strategyList';
+import {TouchableOpacity} from 'react-native';
 
 interface ChangeBetNumberProps {
   show: boolean;
@@ -33,6 +34,11 @@ const ChangeBetNumber = (props: ChangeBetNumberProps) => {
   return (
     <Modal isVisible={show} coverScreen>
       <ScrollView backgroundColor={'white'}>
+        <TouchableOpacity
+          onPress={disable}
+          style={{position: 'absolute', top: 5, right: 10}}>
+          <Text>X</Text>
+        </TouchableOpacity>
         <Center m={2} padding={2}>
           <Text fontWeight={'bold'} fontSize={'lg'}>
             Set Pattern {`${selectedBetNumber}`}

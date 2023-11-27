@@ -16,17 +16,26 @@ import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 import {Rows, Table} from 'react-native-table-component';
 import {useAllResult} from '../../zustanstorage/AllResultStorage';
 import {usePrediction} from '../../zustanstorage/predictions';
+import {usePatternStore} from '../../zustanstorage/patternStorage';
 
 function ButtonPlayV2({
   color,
   persona,
   unitedChoosenRoad,
   moveNext,
+  alreadyRun,
+  setalreadyRun,
+  setpersona,
+  setadder,
 }: {
   color: ColorType;
   persona: 'B' | 'P';
   unitedChoosenRoad: number | null;
   moveNext: 'P' | 'B' | 'X' | null;
+  alreadyRun: number;
+  setalreadyRun: React.Dispatch<React.SetStateAction<number>>;
+  setpersona: React.Dispatch<React.SetStateAction<'P' | 'B' | null>>;
+  setadder: () => void;
 }) {
   const {
     predictAddToBet,
@@ -54,6 +63,8 @@ function ButtonPlayV2({
   } = useGameStore();
 
   const {strategy} = useBetStratStore();
+
+  const {incrementNumberStatus} = usePatternStore();
 
   const updateGrid = (persona: 'P' | 'B') => {
     //Update gameGrid for main road
@@ -298,37 +309,6 @@ function ButtonPlayV2({
     }
   };
 
-  const [alreadyRun, setalreadyRun] = useState(1);
-
-  const setAmountAndStep = () => {
-    if (moveNext) {
-      if (alreadyRun == 1) {
-        const {amount} = strategy[0];
-        console.log(amount, 'fursjbfassssss');
-        setBetAmount(amount);
-      } else {
-        if (nextMove === persona) {
-          const indexInStrat = currentStep - 1;
-          const {onWin} = strategy[indexInStrat];
-          setCurrentStep(onWin);
-
-          const {amount} = strategy[onWin - 1];
-          console.log(amount);
-          setBetAmount(amount);
-        } else {
-          const indexInStrat = currentStep - 1;
-          const {onLose} = strategy[indexInStrat];
-          setCurrentStep(onLose);
-
-          const {amount} = strategy[onLose - 1];
-          console.log(amount);
-          setBetAmount(amount);
-        }
-      }
-      setalreadyRun(alreadyRun + 1);
-    }
-  };
-
   const [compilations_, setcompilations_] = useState<any>(null);
   const {bigEyeResults, cockroachRoadResults, setResult, smallRoadResults} =
     useAllResult();
@@ -360,6 +340,7 @@ function ButtonPlayV2({
             ? 'B'
             : null;
         setPrediction(predicted);
+        setadder();
       }
     }
     if (selectedPattern == 'CHINA 2') {
@@ -376,6 +357,7 @@ function ButtonPlayV2({
             ? 'B'
             : null;
         setPrediction(predicted);
+        setadder();
       }
     }
 
@@ -393,35 +375,68 @@ function ButtonPlayV2({
             ? 'B'
             : null;
         setPrediction(predicted);
+        setadder();
       }
     }
     if (selectedPattern == 'UNITED') {
       const {bigRoad, cockroach, smallRoad} = bankerprediction;
-      console.log('unitedchooseroad', unitedChoosenRoad);
-      if (nextMove) {
-        if (unitedChoosenRoad === 0) {
-          setPrediction(nextMove);
+
+      if (unitedChoosenRoad !== null) {
+        if (nextMove) {
+          if (unitedChoosenRoad === 0) {
+            setPrediction(nextMove);
+            setadder();
+          }
+          if (unitedChoosenRoad === 1) {
+            const predicted =
+              nextMove == 'B' && bigRoad == '🔴'
+                ? 'B'
+                : nextMove == 'B' && bigRoad == '🔵'
+                ? 'P'
+                : nextMove == 'P' && bigRoad == '🔴'
+                ? 'P'
+                : nextMove == 'P' && bigRoad == '🔵'
+                ? 'B'
+                : null;
+            setPrediction(predicted);
+            setadder();
+          }
+          if (unitedChoosenRoad === 2) {
+            const predicted =
+              nextMove == 'B' && smallRoad == '🔴'
+                ? 'B'
+                : nextMove == 'B' && smallRoad == '🔵'
+                ? 'P'
+                : nextMove == 'P' && smallRoad == '🔴'
+                ? 'P'
+                : nextMove == 'P' && smallRoad == '🔵'
+                ? 'B'
+                : null;
+
+            setPrediction(predicted);
+            setadder();
+          }
+          if (unitedChoosenRoad === 3) {
+            const predicted =
+              nextMove == 'B' && cockroach == '🔴'
+                ? 'B'
+                : nextMove == 'B' && cockroach == '🔵'
+                ? 'P'
+                : nextMove == 'P' && cockroach == '🔴'
+                ? 'P'
+                : nextMove == 'P' && cockroach == '🔵'
+                ? 'B'
+                : null;
+            setPrediction(predicted);
+            setadder();
+          }
         }
-        if (unitedChoosenRoad === 1) {
-          const predicted = nextMove == 'B' && bigRoad == '🔴' ? 'B' : 'P';
-          setPrediction(predicted);
-        }
-        if (unitedChoosenRoad === 2) {
-          const predicted = nextMove == 'B' && smallRoad == '🔴' ? 'B' : 'P';
-          setPrediction(predicted);
-        }
-        if (unitedChoosenRoad === 3) {
-          const predicted = nextMove == 'B' && cockroach == '🔴' ? 'B' : 'P';
-          setPrediction(predicted);
-        }
+      } else {
+        setPrediction(' ');
+        setadder();
       }
     }
-  }, [nextMove]);
-
-  useEffect(() => {
-    console.log(moveNext, 'moce');
-    setAmountAndStep();
-  }, [moveNext, nextMove]);
+  }, [nextMove, compilations_]);
 
   useEffect(() => {
     const bigRoad = updateSecondaryRoadOnClick(
@@ -465,8 +480,10 @@ function ButtonPlayV2({
             onPress={() => {
               // onPressButtonPlay(persona)
               try {
+                incrementNumberStatus();
                 play(persona);
                 updateGrid(persona);
+                setpersona(persona);
                 const compilation = addToBetCompilation(persona);
                 setcompilations_(compilation);
               } catch (error) {
@@ -608,73 +625,4 @@ const SymbolData = ({
   );
 };
 
-const NumberData = ({
-  data,
-}: {
-  data: {
-    bigRoad: string | null | undefined;
-    smallRoad: string | null | undefined;
-    cockroach: string | null | undefined;
-  };
-}) => {
-  const {bigRoad, cockroach, smallRoad} = data;
-  return (
-    <View
-      style={{
-        width: '15%',
-        gap: 1,
-        margin: 1,
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <View
-        style={{
-          backgroundColor:
-            bigRoad == '🔴' ? 'red' : bigRoad == '🔵' ? 'blue' : 'white',
-          width: '90%',
-          height: '27%',
-          borderRadius: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text fontSize={8} fontWeight={'bold'} color={'white'}>
-          1
-        </Text>
-      </View>
-      <View
-        style={{
-          backgroundColor:
-            smallRoad == '🔴' ? 'red' : smallRoad == '🔵' ? 'blue' : 'white',
-          width: '90%',
-          height: '27%',
-          borderRadius: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text fontSize={8} fontWeight={'bold'} color={'white'}>
-          2
-        </Text>
-      </View>
-      <View
-        style={{
-          backgroundColor:
-            cockroach == '🔴' ? 'red' : cockroach == '🔵' ? 'blue' : 'white',
-          width: '90%',
-          height: '27%',
-          borderRadius: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Text fontSize={8} fontWeight={'bold'} color={'white'}>
-          3
-        </Text>
-      </View>
-    </View>
-  );
-};
 export default React.memo(ButtonPlayV2);

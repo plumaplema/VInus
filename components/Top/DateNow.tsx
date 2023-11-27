@@ -46,10 +46,10 @@ function DateNow(props: props) {
           height: '100%',
         }}>
         <ChangeBetNumber disable={() => setcount(0)} show={count > 3} />
-        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 5}}>
+        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 10}}>
           On {formattedDate}
         </Text>
-        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 5}}>
+        <Text style={{color: 'yellow', textAlign: 'center', fontSize: 10}}>
           {formattedTime}
         </Text>
       </View>

@@ -12,6 +12,7 @@ import Modal from 'react-native-modal';
 import {useEffect, useMemo, useState} from 'react';
 import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {TouchableOpacity} from 'react-native';
 
 interface ChangePatternProps {
   show: boolean;
@@ -82,6 +83,11 @@ const ChangePattern = (props: ChangePatternProps) => {
   return (
     <Modal isVisible={show} coverScreen>
       <ScrollView backgroundColor={'white'}>
+        <TouchableOpacity
+          onPress={disable}
+          style={{position: 'absolute', top: 5, right: 10}}>
+          <Text>X</Text>
+        </TouchableOpacity>
         <Center m={2} padding={2}>
           <Text fontWeight={'bold'} fontSize={'lg'}>
             Set Pattern {`${selectedPattern} ${selectedPatternNumber}`}
@@ -122,7 +128,6 @@ const ChangePattern = (props: ChangePatternProps) => {
               // /
               addRow();
               setaddCount(addCount + 1);
-              console.log('TESTE');
             }}
             backgroundColor={'blue.900'}
             w={'80%'}>

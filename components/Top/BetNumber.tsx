@@ -16,6 +16,7 @@ function BetNumber(props: props) {
         width: props.width,
         backgroundColor: 'white',
         padding: 3,
+        height: '100%',
         margin: 2,
         display: 'flex',
         justifyContent: 'center',

@@ -10,6 +10,8 @@ interface PatternState {
       Array<{nextMove: 'P' | 'B' | 'X'; pattern: Array<'P' | 'B'>}>
     >;
   }>;
+  numberStatus: number;
+  incrementNumberStatus: () => void;
   updatePattern: (
     patternKeyIndex: number,
     indexInPattern: number,
@@ -55,11 +57,16 @@ export const usePatternStore = create<PatternState>()(
             ],
           },
         ],
+        numberStatus: 0,
+        incrementNumberStatus() {
+          set(state => {
+            return {numberStatus: state.numberStatus + 1};
+          });
+        },
         updatePattern: (patternKeyIndex, indexInPattern, pattern) => {
           set(state => {
             const copy = state.allPatterns;
             copy[patternKeyIndex]['patterns'][indexInPattern] = pattern;
-            console.log(copy);
             return {allPatterns: copy};
           });
         },

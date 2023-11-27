@@ -48,6 +48,11 @@ function ChangePatternUsage(props: ChangePatternUsage) {
     <Modal style={{backgroundColor: 'white'}} coverScreen isVisible={isVisble}>
       <View style={{flex: 1, backgroundColor: 'white'}}>
         <ScrollView w={'100%'}>
+          <TouchableOpacity
+            onPress={closeModal}
+            style={{position: 'absolute', top: 5, right: 10}}>
+            <Text>X</Text>
+          </TouchableOpacity>
           <View
             style={{marginTop: 10}}
             w={'100%'}

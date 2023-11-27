@@ -19,7 +19,7 @@ function Round(props: props) {
         marginLeft: 15,
         marginRight: 1,
         width: props.width,
-        height: 25,
+        height: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

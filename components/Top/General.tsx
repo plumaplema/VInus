@@ -25,6 +25,7 @@ function General(props: props) {
         margin: 2,
         display: 'flex',
         justifyContent: 'center',
+        height: '100%',
         alignItems: 'center',
       }}>
       <ChangePatternUsage

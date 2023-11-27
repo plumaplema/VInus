@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import Benifit from './BenifitSum/Benifit';
 import {Center, Flex, HStack, VStack, Text} from 'native-base';
@@ -11,15 +11,22 @@ import {useGeneralStoreRoad} from '../../zustanstorage/generalStorage';
 function MainFourthLayer({
   unitedChoosenRoad,
   moveNext,
+  alreadyRun,
+  setalreadyRun,
+  setpersona,
+  setadder,
 }: {
   unitedChoosenRoad: number | null;
   moveNext: 'P' | 'B' | 'X' | null;
+  alreadyRun: number;
+  setalreadyRun: React.Dispatch<React.SetStateAction<number>>;
+  setpersona: React.Dispatch<React.SetStateAction<'P' | 'B' | null>>;
+  setadder: () => void;
 }) {
   const {betSum, betCompilations, totalbetAmount, nextMove, undo} =
     useGameStore();
   const {selectedPattern} = useGeneralStoreRoad();
   const {prediction} = usePrediction();
-  console.log(selectedPattern, prediction, nextMove, 'Here');
   return (
     <VStack h={'100%'} w={'100%'} alignItems={'c'}>
       <HStack h={'20%'} w={'100%'}>
@@ -30,16 +37,24 @@ function MainFourthLayer({
       {/* <Center m={1} w={'70%'} h={"25%"} borderRadius={100} backgroundColor={'red.100'}>            </Center> */}
       <Flex height={'60%'} w={'100%'} flexDirection={'column'}>
         <ButtonPlayV2
+          setpersona={setpersona}
+          alreadyRun={alreadyRun}
+          setalreadyRun={setalreadyRun}
           unitedChoosenRoad={unitedChoosenRoad}
           color={'blue.500'}
           persona="P"
           moveNext={moveNext}
+          setadder={setadder}
         />
         <ButtonPlayV2
+          setpersona={setpersona}
+          alreadyRun={alreadyRun}
+          setalreadyRun={setalreadyRun}
           unitedChoosenRoad={unitedChoosenRoad}
           color={'red.500'}
           persona="B"
           moveNext={moveNext}
+          setadder={setadder}
         />
       </Flex>
       <HStack h={'20%'} w={'100%'}>

@@ -622,6 +622,7 @@ function App(): JSX.Element {
       if (selectedPattern == 'UNITED') {
         if (prediction !== ' ' && prediction) {
           if (betAmount === 0) {
+            console.log('running here');
             const {amount} = strategy[currentStep - 1];
             setBetAmount(amount);
             return;

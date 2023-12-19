@@ -172,26 +172,20 @@ function ButtonPlayV2({
   };
 
   //Use
+  const updateRoads = (
+    index: number,
+    coordinates: {first: number; second: number},
+    player: any,
+  ) => {
+    return updateSecondaryRoadOnClick(index, coordinates, index, player);
+  };
+
   const playerpredict = () => {
     const player = predictAddToBet('P');
-    const bigRoad = updateSecondaryRoadOnClick(
-      1,
-      {first: 1, second: 2},
-      1,
-      player,
-    );
-    const smallRoad = updateSecondaryRoadOnClick(
-      2,
-      {first: 1, second: 3},
-      2,
-      player,
-    );
-    const cockroach = updateSecondaryRoadOnClick(
-      3,
-      {first: 1, second: 4},
-      3,
-      player,
-    );
+    const bigRoad = updateRoads(1, {first: 1, second: 2}, player);
+    const smallRoad = updateRoads(2, {first: 1, second: 3}, player);
+    const cockroach = updateRoads(3, {first: 1, second: 4}, player);
+
     return {
       bigRoad,
       smallRoad,
@@ -201,24 +195,10 @@ function ButtonPlayV2({
 
   const bankerpredict = () => {
     const player = predictAddToBet('B');
-    const bigRoad = updateSecondaryRoadOnClick(
-      1,
-      {first: 1, second: 2},
-      1,
-      player,
-    );
-    const smallRoad = updateSecondaryRoadOnClick(
-      2,
-      {first: 1, second: 3},
-      2,
-      player,
-    );
-    const cockroach = updateSecondaryRoadOnClick(
-      3,
-      {first: 1, second: 4},
-      3,
-      player,
-    );
+    const bigRoad = updateRoads(1, {first: 1, second: 2}, player);
+    const smallRoad = updateRoads(2, {first: 1, second: 3}, player);
+    const cockroach = updateRoads(3, {first: 1, second: 4}, player);
+
     return {
       bigRoad,
       smallRoad,
@@ -226,29 +206,20 @@ function ButtonPlayV2({
     };
   };
 
-  const {prediction, setPrediction} = usePrediction();
+  const {setPrediction} = usePrediction();
   const bankerprediction = useMemo(() => bankerpredict(), [betCompilations]);
   const playerprediction = useMemo(() => playerpredict(), [betCompilations]);
 
   const getFreshRow = (where: 'bigroad' | 'smallroad' | 'cockroach') => {
-    const whatRoad =
-      where === 'bigroad'
-        ? bigRoadCompilation
-        : where == 'cockroach'
-        ? cockroachRoadCompilation
-        : smallRoadCompilation;
-    let index = -1;
-    for (
-      let rowIndex = 0;
-      rowIndex < bigRoadCompilation[0].length;
-      rowIndex++
-    ) {
-      const fresh = whatRoad[0][rowIndex] == '⚪';
-      if (fresh) {
-        index = rowIndex;
-        break;
-      }
-    }
+    const roadMap = {
+      bigroad: bigRoadCompilation,
+      smallroad: smallRoadCompilation,
+      cockroach: cockroachRoadCompilation,
+    };
+
+    const whatRoad = roadMap[where];
+    const index = whatRoad[0].findIndex(row => row === '⚪');
+
     return index;
   };
 
@@ -310,8 +281,7 @@ function ButtonPlayV2({
   };
 
   const [compilations_, setcompilations_] = useState<any>(null);
-  const {bigEyeResults, cockroachRoadResults, setResult, smallRoadResults} =
-    useAllResult();
+  const {setResult} = useAllResult();
 
   const allResultSetter = (
     result: '🔴' | '🔵' | null | undefined,
@@ -323,118 +293,54 @@ function ButtonPlayV2({
     }
   };
 
-  const getrightresult = (road: any, nextMove: 'P' | 'B' | 'X' | null) => {};
+  const predict = (nextMove: string, road: string | null | undefined) => {
+    return nextMove == 'B' && road == '🔴'
+      ? 'B'
+      : nextMove == 'B' && road == '🔵'
+      ? 'P'
+      : nextMove == 'P' && road == '🔴'
+      ? 'P'
+      : nextMove == 'P' && road == '🔵'
+      ? 'B'
+      : null;
+  };
 
   useEffect(() => {
-    if (selectedPattern == 'CHINA 1') {
-      const {bigRoad, cockroach, smallRoad} = bankerprediction;
-      if (nextMove) {
-        const predicted =
-          nextMove == 'B' && bigRoad == '🔴'
-            ? 'B'
-            : nextMove == 'B' && bigRoad == '🔵'
-            ? 'P'
-            : nextMove == 'P' && bigRoad == '🔴'
-            ? 'P'
-            : nextMove == 'P' && bigRoad == '🔵'
-            ? 'B'
-            : null;
-        setPrediction(predicted);
-        setadder();
-      }
-    }
-    if (selectedPattern == 'CHINA 2') {
-      const {bigRoad, cockroach, smallRoad} = bankerprediction;
-      if (nextMove) {
-        const predicted =
-          nextMove == 'B' && smallRoad == '🔴'
-            ? 'B'
-            : nextMove == 'B' && smallRoad == '🔵'
-            ? 'P'
-            : nextMove == 'P' && smallRoad == '🔴'
-            ? 'P'
-            : nextMove == 'P' && smallRoad == '🔵'
-            ? 'B'
-            : null;
-        setPrediction(predicted);
-        setadder();
-      }
-    }
+    const {bigRoad, cockroach, smallRoad} = bankerprediction;
 
-    if (selectedPattern == 'CHINA 3') {
-      const {bigRoad, cockroach, smallRoad} = bankerprediction;
-      if (nextMove) {
-        const predicted =
-          nextMove == 'B' && cockroach == '🔴'
-            ? 'B'
-            : nextMove == 'B' && cockroach == '🔵'
-            ? 'P'
-            : nextMove == 'P' && cockroach == '🔴'
-            ? 'P'
-            : nextMove == 'P' && cockroach == '🔵'
-            ? 'B'
-            : null;
-        setPrediction(predicted);
-        setadder();
-      }
-    }
-    if (selectedPattern == 'UNITED') {
-      const {bigRoad, cockroach, smallRoad} = bankerprediction;
+    if (nextMove) {
+      let predicted;
 
-      if (unitedChoosenRoad !== null) {
-        if (nextMove) {
-          if (unitedChoosenRoad === 0) {
-            setPrediction(nextMove);
-            setadder();
+      switch (selectedPattern) {
+        case 'CHINA 1':
+          predicted = predict(nextMove, bigRoad);
+          break;
+        case 'CHINA 2':
+          predicted = predict(nextMove, smallRoad);
+          break;
+        case 'CHINA 3':
+          predicted = predict(nextMove, cockroach);
+          break;
+        case 'UNITED':
+          if (unitedChoosenRoad !== null) {
+            const road =
+              unitedChoosenRoad === 0
+                ? nextMove
+                : unitedChoosenRoad === 1
+                ? bigRoad
+                : unitedChoosenRoad === 2
+                ? smallRoad
+                : cockroach;
+            predicted =
+              unitedChoosenRoad === 0 ? nextMove : predict(nextMove, road);
+          } else {
+            predicted = ' ';
           }
-          if (unitedChoosenRoad === 1) {
-            const predicted =
-              nextMove == 'B' && bigRoad == '🔴'
-                ? 'B'
-                : nextMove == 'B' && bigRoad == '🔵'
-                ? 'P'
-                : nextMove == 'P' && bigRoad == '🔴'
-                ? 'P'
-                : nextMove == 'P' && bigRoad == '🔵'
-                ? 'B'
-                : null;
-            setPrediction(predicted);
-            setadder();
-          }
-          if (unitedChoosenRoad === 2) {
-            const predicted =
-              nextMove == 'B' && smallRoad == '🔴'
-                ? 'B'
-                : nextMove == 'B' && smallRoad == '🔵'
-                ? 'P'
-                : nextMove == 'P' && smallRoad == '🔴'
-                ? 'P'
-                : nextMove == 'P' && smallRoad == '🔵'
-                ? 'B'
-                : null;
-
-            setPrediction(predicted);
-            setadder();
-          }
-          if (unitedChoosenRoad === 3) {
-            const predicted =
-              nextMove == 'B' && cockroach == '🔴'
-                ? 'B'
-                : nextMove == 'B' && cockroach == '🔵'
-                ? 'P'
-                : nextMove == 'P' && cockroach == '🔴'
-                ? 'P'
-                : nextMove == 'P' && cockroach == '🔵'
-                ? 'B'
-                : null;
-            setPrediction(predicted);
-            setadder();
-          }
-        }
-      } else {
-        setPrediction(' ');
-        setadder();
+          break;
       }
+
+      setPrediction(predicted);
+      setadder();
     }
   }, [nextMove, compilations_]);
 

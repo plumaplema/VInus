@@ -18,6 +18,7 @@ export const useAllResult = create<GameState>()(
       setResult: (result, where) => {
         set(state => {
           if (where == 'B') {
+            console.log('big eye');
             return {bigEyeResults: [...state.bigEyeResults, result]};
           }
           if (where == 'C') {

@@ -38,6 +38,7 @@ import {useGeneralStoreRoad} from './zustanstorage/generalStorage';
 import {useAllResult} from './zustanstorage/AllResultStorage';
 import {useBetStratStore} from './zustanstorage/betStratStorage';
 import {usePrediction} from './zustanstorage/predictions';
+import {ModalLicense} from './components/ModalLicense';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -264,10 +265,14 @@ function App(): JSX.Element {
     result: ('P' | 'B')[],
     count: number = 0,
     patterna: Array<Array<'P' | 'B'>>,
+    index: number,
   ) => {
     const lastResult = result[result.length - 1];
 
     const resultToCheck = result.slice(0, -1);
+    if (index == 1) {
+      console.log({resultToCheck, lastResult, count, result});
+    }
     let totalcount: number = 0;
     const filterPattern = pattern.filter(
       pattern_ => pattern_.nextMove === lastResult,
@@ -277,7 +282,7 @@ function App(): JSX.Element {
       totalcount += 1;
 
       patterna.push(inPattern.patternFound);
-      return solvedCounter(resultToCheck, count + totalcount, patterna);
+      return solvedCounter(resultToCheck, count + totalcount, patterna, index);
     }
     return {count, patterna};
   };
@@ -290,16 +295,25 @@ function App(): JSX.Element {
       smallRoadResults,
       cockroachRoadResults,
     ];
+    console.log({allresult, resultToUse});
     if (!status) {
       resultToUse[road] = [];
     }
 
     const result: Array<{nextMove: 'P' | 'B' | 'X'; count: number}> =
-      resultToUse.map(result_ => {
-        if (result_.length == 1) {
+      resultToUse.map((result_, index) => {
+        const resultUse =
+          index == 0
+            ? allresult
+            : index == 1
+            ? bigEyeResults
+            : index == 2
+            ? smallRoadResults
+            : cockroachRoadResults;
+        if (resultUse.length == 1) {
           return {nextMove: 'X', count: 0, pattern: []};
         }
-        const count = solvedCounter(result_, 0, []);
+        const count = solvedCounter(resultUse, 0, [], index);
         return {
           nextMove: count.patterna.length == 0 ? 'X' : count.patterna[0][0],
           count: count.count,
@@ -405,26 +419,14 @@ function App(): JSX.Element {
 
   const [movenext, setmovenext] = useState<'P' | 'B' | 'X' | null>(null);
   useEffect(() => {
-    // lastResultAll();
-
     if (selectedPattern === 'UNITED') {
-      const longest = longestSinglePattern();
-      const {road, status} = checker();
       const united = identifyForUnited();
 
-      if (longest) {
-        const {count, nextMove, pattern, road} = longest;
-        setUnitedChoosenRoad(road);
-        setNexMove(nextMove);
-        return;
-      }
-
-      let maxCountIndex = united.reduce(
-        (maxIndex, currentElement, currentIndex, array) => {
-          return currentElement.count > array[maxIndex].count
+      const maxCountIndex = united.reduce(
+        (maxIndex, currentElement, currentIndex, array) =>
+          currentElement.count > array[maxIndex].count
             ? currentIndex
-            : maxIndex;
-        },
+            : maxIndex,
         0,
       );
 
@@ -434,65 +436,9 @@ function App(): JSX.Element {
         setUnitedChoosenRoad(maxCountIndex);
         setNexMove(nextMove);
       } else {
-        const allResults = [
-          allresult,
-          bigEyeResults,
-          smallRoadResults,
-          cockroachRoadResults,
-        ];
-        if (!status) {
-          allResults[road] = [];
-        }
-        const unitedResult = unitedVersionCrawler(allResults, null, -1, -1);
-        if (unitedResult) {
-          setUnitedChoosenRoad(unitedResult.road);
-          setNexMove(unitedResult.result);
-        } else {
-          setNexMove('X');
-          setUnitedChoosenRoad(null);
-        }
+        setUnitedChoosenRoad(null);
+        setNexMove('X');
       }
-      // else {
-      //   const allResults = [
-      //     allresult,
-      //     bigEyeResults,
-      //     smallRoadResults,
-      //     cockroachRoadResults,
-      //   ];
-      //   const unitedResult = unitedVersionCrawler(allResults, null, -1, -1);
-      //   const roadtype = [
-      //     allresult,
-      //     bigEyeResults,
-      //     smallRoadResults,
-      //     cockroachRoadResults,
-      //   ];
-
-      //   if (unitedResult) {
-      //     console.log(unitedResult, 'Resuult');
-      //     const {result, road} = unitedResult;
-      //     const roadtype_ = roadtype[unitedResult.road];
-      //     setUnitedChoosenRoad(road);
-      //     setNexMove(result);
-      //     // if (roadtype_.length == 1) {
-      //     //   setUnitedChoosenRoad(null);
-      //     //   setmovenext(null);
-      //     //   setNexMove('X');
-      //     // } else {
-      //     //   if (
-      //     //     roadtype_[roadtype_.length - 2] !==
-      //     //     roadtype_[roadtype_.length - 1]
-      //     //   ) {
-      //     //     setUnitedChoosenRoad(null);
-      //     //     setmovenext(null);
-      //     //     setNexMove('X');
-      //     //     setPrediction(null);
-      //     //   } else {
-      //     //     setUnitedChoosenRoad(road);
-      //     //     setNexMove(result);
-      //     //   }
-      //     // }
-      //   }
-      // }
     } else {
       const resultToUse =
         selectedPattern == 'GENERAL'
@@ -593,8 +539,6 @@ function App(): JSX.Element {
       if (prediction !== ' ' && prediction) {
         if (prediction === persona) {
           const {onWin} = strategy[currentStep - 1];
-          console.log('Winner', strategy[currentStep - 1]);
-          //winner
           setlastStep(step);
           setCurrentStep(onWin);
           const {amount} = strategy[onWin - 1];
@@ -602,7 +546,6 @@ function App(): JSX.Element {
           return;
         } else {
           const {onLose} = strategy[currentStep - 1];
-          console.log('losser', strategy[currentStep - 1]);
           setCurrentStep(onLose);
           setlastStep(step);
           const {amount} = strategy[onLose - 1];
@@ -610,7 +553,6 @@ function App(): JSX.Element {
           return;
         }
       } else {
-        console.log('no prediction', strategy[currentStep - 1]);
         setBetAmount(0);
         return;
       }
@@ -622,7 +564,6 @@ function App(): JSX.Element {
       if (selectedPattern == 'UNITED') {
         if (prediction !== ' ' && prediction) {
           if (betAmount === 0) {
-            console.log('running here');
             const {amount} = strategy[currentStep - 1];
             setBetAmount(amount);
             return;
@@ -630,7 +571,6 @@ function App(): JSX.Element {
 
           if (alreadyRun > 0) {
             if (nextMove === persona) {
-              console.log('running here');
               const indexInStrat = currentStep - 1;
               const {onWin} = strategy[indexInStrat];
               setCurrentStep(onWin);
@@ -639,7 +579,6 @@ function App(): JSX.Element {
               setBetAmount(amount);
               return;
             } else {
-              console.log('running here onlose');
               const indexInStrat = currentStep - 1;
               const {onLose} = strategy[indexInStrat];
               setCurrentStep(onLose);
@@ -699,6 +638,7 @@ function App(): JSX.Element {
           backgroundColor={'transparent'}
           hidden={true}
         />
+        <ModalLicense />
         <ScrollView style={{backgroundColor: 'gray', gap: 1}}>
           <Center flexDirection={'row'} h={'12%'} p={1}>
             <Center w={'45%'}>

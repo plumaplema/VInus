@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Dimensions,
@@ -630,6 +630,10 @@ function App(): JSX.Element {
     }
   };
 
+  const modalLicenseMemo = useMemo(() => {
+    return <ModalLicense />;
+  }, []);
+
   return (
     <NativeBaseProvider>
       <Flex flex={1} justifyContent={'center'} height={height}>
@@ -638,9 +642,9 @@ function App(): JSX.Element {
           backgroundColor={'transparent'}
           hidden={true}
         />
-        <ModalLicense />
-        <ScrollView style={{backgroundColor: 'gray', gap: 1}}>
-          <Center flexDirection={'row'} h={'12%'} p={1}>
+        {modalLicenseMemo}
+        <View style={{backgroundColor: 'gray', gap: 1, height: '100%'}}>
+          <Center flexDirection={'row'} h={'10%'} p={1}>
             <Center w={'45%'}>
               <HStack h={'100%'} space={1}>
                 <Center p={1} backgroundColor={'black'}>
@@ -739,7 +743,7 @@ function App(): JSX.Element {
           </Flex>
 
           <Flex
-            height={'60%'}
+            height={'50%'}
             justifyContent={'center'}
             alignItems={'center'}
             flexDirection={'row'}
@@ -755,11 +759,11 @@ function App(): JSX.Element {
                 unitedChoosenRoad={unitedChoosenRoad}
               />
             </Flex>
-            <Flex w={'70%'}>
+            <Flex h={'100%'} w={'70%'}>
               <BetBestStep />
             </Flex>
           </Flex>
-        </ScrollView>
+        </View>
       </Flex>
     </NativeBaseProvider>
   );

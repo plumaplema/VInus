@@ -22,22 +22,11 @@ function BetBestStep() {
         </Flex>
       </Flex>
       <Flex mt={1} mb={1} h={'31%'} flexDirection={'row'}>
-        {/* <Center borderColor={'blue.900'} borderWidth={'2'} m={1} w={"20%"} backgroundColor={'white'}>
-                    <Text color={'gray.400'} fontWeight={'bold'}>
-                        Best
-                    </Text>
-
-                </Center> */}
         <Flex w={'95%'} borderColor={'blue.900'} borderWidth={'1px'}>
           <SmallRoad />
         </Flex>
       </Flex>
       <Flex h={'31%'} flexDirection={'row'}>
-        {/* <Center m={1} borderColor={'black'} borderWidth={'2'} w={"20%"} backgroundColor={'lightblue'}>
-                    <Text color={'gray.400'} fontWeight={'bold'} >
-                        BET
-                    </Text>
-                </Center> */}
         <Flex w={'95%'} borderColor={'black'} borderWidth={'1px'}>
           <Cockroach />
         </Flex>

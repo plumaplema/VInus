@@ -19,7 +19,7 @@ const BigEye: React.FC<BigEyeProps> = () => {
             borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
             <Rows
               style={{width: '100%', height: '16.66%'}}
-              textStyle={{fontSize: 5.5}}
+              textStyle={{fontSize: 9}}
               data={bigRoadCompilation}
             />
           </Table>

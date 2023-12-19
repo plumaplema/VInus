@@ -83,7 +83,11 @@ export const ModalLicense = () => {
     checkLicense();
   }, []);
 
-  if (!connectedToNet) {
+  useEffect(() => {
+    console.log(licenseStatus, 'sdsdsdsdsdsdsdsdsdsd');
+  }, [licenseStatus]);
+
+  if (!connectedToNet && !licenseStatus) {
     return (
       <Modal animationType="slide" transparent={true} visible={true}>
         <View
